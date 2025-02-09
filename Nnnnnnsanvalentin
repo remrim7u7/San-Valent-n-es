@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para Ti</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #ffdde1;
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            color: #d10068;
+            overflow: hidden;
+        }
+
+        .container {
+            z-index: 2;
+            max-width: 80%;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            font-size: 36px;
+        }
+
+        p {
+            font-size: 22px;
+            min-height: 30px;
+        }
+
+        .buttons {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .button {
+            padding: 12px 25px;
+            background: #ff4081;
+            color: white;
+            font-size: 18px;
+            text-decoration: none;
+            border-radius: 10px;
+            border: none;
+            margin: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .button:hover {
+            background: #d10068;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="backgroundCanvas"></canvas>
+
+    <div class="container">
+        <h1 id="title">Para Ti</h1>
+        <button class="button" id="startButton" onclick="startMessage()">Haz clic para empezar</button>
+        <p id="message"></p>
+
+        <div class="buttons" id="buttons">
+            <button class="button" onclick="showResponse('sí')">Sí</button>
+            <button class="button" onclick="showResponse('no')">No</button>
+        </div>
+    </div>
+
+    <script>
+        const messages = [
+            "Eres una persona increíble.",
+            "Desde que te conocí, mi mundo es más bonito.",
+            "Me encanta hablar contigo y pasar tiempo juntos.",
+            "Eres especial y quiero que lo sepas.",
+            "Y ahora, quiero hacerte una pregunta importante..."
+        ];
+
+        const noResponses = [
+            "¿Estás segura? ¡Piensa bien tu respuesta!",
+            "Ay... eso duele, pero te daré otra oportunidad.",
+            "Creo que merezco una segunda oportunidad...",
+            "Voy a fingir que no vi eso. Intentemos de nuevo.",
+            "Sabes que en el fondo quieres decir que sí.",
+            "Vuelve a intentarlo, esta vez con el corazón."
+        ];
+
+        let index = 0;
+        let messageElement = document.getElementById("message");
+        let titleElement = document.getElementById("title");
+        let buttonsElement = document.getElementById("buttons");
+        let startButton = document.getElementById("startButton");
+        let noIndex = 0;
+
+        function typeMessage(text, callback) {
+            let i = 0;
+            messageElement.innerHTML = "";
+            function typing() {
+                if (i < text.length) {
+                    messageElement.innerHTML += text[i];
+                    i++;
+                    setTimeout(typing, 50);
+                } else if (callback) {
+                    setTimeout(callback, 1000);
+                }
+            }
+            typing();
+        }
+
+        function startMessage() {
+            startButton.style.display = "none";
+            nextMessage();
+        }
+
+        function nextMessage() {
+            if (index < messages.length) {
+                typeMessage(messages[index], () => {
+                    index++;
+                    setTimeout(nextMessage, 2000);
+                });
+            } else {
+                titleElement.innerHTML = "¿Quieres ser mi San Valentín?";
+                buttonsElement.style.display = "block";
+            }
+        }
+
+        function showResponse(answer) {
+            if (answer === "sí") {
+                messageElement.innerHTML = "Camila, eres una mujer excepcional y te quiero más que nada.";
+                setTimeout(() => {
+                    messageElement.innerHTML = "Te adoro, Camila, tu increíble personalidad me hace sentir ser el hombre más afortunado del mundo.";
+                }, 3000);
+                buttonsElement.style.display = "none";
+            } else {
+                alert(noResponses[noIndex]);
+                noIndex = (noIndex + 1) % noResponses.length;
+            }
+        }
+
+        // Fondo animado con partículas
+        const canvas = document.getElementById("backgroundCanvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particlesArray = [];
+        const colors = ["#ff4081", "#ff79a8", "#ffbfd5", "#ffffff"];
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 4 + 1;
+                this.speedX = (Math.random() - 0.5) * 1.5;
+                this.speedY = (Math.random() - 0.5) * 1.5;
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particlesArray = [];
+            for (let i = 0; i < 100; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+            }
+            requestAnimationFrame(animateParticles);
+        }
+
+        initParticles();
+        animateParticles();
+
+        window.addEventListener("resize", () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initParticles();
+        });
+    </script>
+</body>
